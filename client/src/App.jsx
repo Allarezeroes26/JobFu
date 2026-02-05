@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import { userAuth } from './stores/userStores'
 import { useEffect } from 'react'
+import Profile from './pages/Profile'
 
 
 function App() {
@@ -40,6 +41,10 @@ function App() {
         {
           path: '/register',
           element: !authUser ? <Register/> : <Navigate to='/'/>
+        },
+        {
+          path: '/profile',
+          element: authUser? <Profile/> : <Navigate to='/login'/>
         }
       ]
     }

@@ -7,6 +7,7 @@ export const userAuth = create((set) => ({
     isChecking: false,
     isLogging: false,
     isRegistering: false,
+    isUpdating: false,
 
     checkUser: async () => {
 
@@ -58,6 +59,22 @@ export const userAuth = create((set) => ({
         } catch (err) {
             const message = err.response?.data?.message || err.message || 'Something went wrong!'
             toast.error(message)
+        }
+    },
+
+    update: async (formData) => {
+        set({ isUpdating: true })
+        try {
+            const res = await api.put('/api/auth/update', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+
+            set({ authUser: res.data.user })
+            toast.success('Account successfully updated!')
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Something went wrong!')
+        } finally {
+            set({ isUpdating: false })
         }
     }
 }))

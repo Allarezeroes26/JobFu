@@ -22,7 +22,8 @@ const userSchema = new mongoose.Schema({
   },
 
   skills: [String],
-  resume: String,
+  resume: {type: String},
+  resumeName: {type: String},
 
   appliedJobs: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Application" }

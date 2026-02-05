@@ -2,6 +2,7 @@ const User = require('../models/userModel')
 const bcrypt = require('bcrypt');
 const genToken = require('../utils/generateToken');
 const cloudinary = require('../utils/cloudinary')
+const streamifier = require('streamifier')
 
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
@@ -77,41 +78,77 @@ const logoutUser = async (req, res) => {
     }
 }
 
+const uploadToCloudinary = (buffer, folder, resource_type = 'image', originalName) => {
+  return new Promise((resolve, reject) => {
+    let finalPublicId = undefined;
+    if (originalName) {
+      finalPublicId = (resource_type === 'raw') 
+        ? originalName 
+        : originalName.replace(/\.[^/.]+$/, "");
+    }
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type,
+        overwrite: true,
+        public_id: finalPublicId,
+        use_filename: true,
+        unique_filename: false
+      },
+      (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      }
+    );
+
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
+};
+
 const updateUser = async (req, res) => {
-  const {
-    firstName, lastName, email, address, description, skills, resume, education, profilePic } = req.body;
+  const { firstName, lastName, email, address, description, skills, education } = req.body;
+  const profilePicFile = req.files?.profilePic?.[0];
+  const resumeFile = req.files?.resume?.[0];
 
   try {
     const user = await User.findById(req.user._id).select('+password');
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User doesn't exist" });
+    if (!user) return res.status(404).json({ success: false, message: "User doesn't exist" });
+
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+    if (email) user.email = email;
+    if (address) user.address = address;
+    if (description) user.description = description;
+    if (skills) user.skills = skills.split(',').map(s => s.trim());
+    if (education) user.education = education;
+
+    if (profilePicFile) {
+      const result = await uploadToCloudinary(profilePicFile.buffer, 'profile_pics', 'image');
+      user.profilePic = result.secure_url;
     }
 
-    if (firstName !== undefined) user.firstName = firstName;
-    if (lastName !== undefined) user.lastName = lastName;
-    if (email !== undefined) user.email = email;
-    if (address !== undefined) user.address = address;
-    if (description !== undefined) user.description = description;
-    if (skills !== undefined) user.skills = skills;
-    if (education !== undefined) user.education = education;
+    if (resumeFile) {
+    const path = require('path');
+    const fileExt = path.extname(resumeFile.originalname);
+    const sanitizeFileName = (name) => {
+        const base = name.replace(/\.[^/.]+$/, "");
+        const cleanBase = base.replace(/[^a-zA-Z0-9-_]/g, "_").substring(0, 50);
+        return cleanBase + fileExt; 
+    };
 
-    if (profilePic) {
-      const uploadResponse = await cloudinary.uploader.upload(profilePic, {
-        folder: 'profile_pics',
-        overwrite: true,
-      });
-      user.profilePic = uploadResponse.secure_url;
+    const publicIdWithExt = sanitizeFileName(resumeFile.originalname);
+
+    const result = await uploadToCloudinary(
+        resumeFile.buffer,
+        'resume',
+        'raw',
+        publicIdWithExt
+    );
+
+    user.resume = result.secure_url;
+    user.resumeName = resumeFile.originalname;
     }
-
-    if (resume) {
-        const uploadResponse = await cloudinary.uploader.upload(resume, {
-            folder: 'resume',
-            resource_type: 'raw',
-            overwrite: true
-        })
-        user.resume = uploadResponse.secure_url;
-    }
-
     const updatedUser = await user.save();
 
     res.status(200).json({
@@ -124,6 +161,7 @@ const updateUser = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update user' });
   }
 };
+
 
 const checkUser = async (req, res) => {
     try {
