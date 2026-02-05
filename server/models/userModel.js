@@ -7,6 +7,14 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
 
+  address: { type: String },
+
+  profilePic: { type: String },
+
+  description: {type: String},
+
+  education: {type: String},
+
   role: {
     type: String,
     enum: ["seeker", "employer"],

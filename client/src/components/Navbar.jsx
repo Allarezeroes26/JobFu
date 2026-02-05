@@ -26,19 +26,22 @@ const Navbar = () => {
         
         {/* Logo Section */}
         <div className="flex items-center gap-2">
-          <div className="bg-primary p-1.5 rounded-lg">
-            <BriefcaseBusiness className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">
-            JobFu
-          </span>
+            <div className="bg-primary p-1.5 rounded-lg">
+              <BriefcaseBusiness className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <span className="cursor-default text-xl font-bold tracking-tight">
+              JobFu
+            </span>
         </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <a href="/jobs" className="transition-colors hover:text-primary">Find Jobs</a>
+          {/* <a href="/jobs" className="transition-colors hover:text-primary">Find Jobs</a>
           <a href="/companies" className="transition-colors hover:text-primary">Companies</a>
-          <a href="/activity" className="transition-colors hover:text-primary">My Activity</a>
+          <a href="/activity" className="transition-colors hover:text-primary">My Activity</a> */}
+          <Button variant='link'>Find Jobs</Button>
+          <Button variant='link'>Companies</Button>
+          <Button variant='link'>My Activity</Button>
         </div>
 
         {/* Action Buttons / Profile */}

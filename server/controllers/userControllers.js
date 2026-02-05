@@ -1,6 +1,7 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt');
 const genToken = require('../utils/generateToken');
+const cloudinary = require('../utils/cloudinary')
 
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
@@ -76,8 +77,53 @@ const logoutUser = async (req, res) => {
     }
 }
 
-const updateUser = async () => {
-}
+const updateUser = async (req, res) => {
+  const {
+    firstName, lastName, email, address, description, skills, resume, education, profilePic } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User doesn't exist" });
+    }
+
+    if (firstName !== undefined) user.firstName = firstName;
+    if (lastName !== undefined) user.lastName = lastName;
+    if (email !== undefined) user.email = email;
+    if (address !== undefined) user.address = address;
+    if (description !== undefined) user.description = description;
+    if (skills !== undefined) user.skills = skills;
+    if (education !== undefined) user.education = education;
+
+    if (profilePic) {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+        folder: 'profile_pics',
+        overwrite: true,
+      });
+      user.profilePic = uploadResponse.secure_url;
+    }
+
+    if (resume) {
+        const uploadResponse = await cloudinary.uploader.upload(resume, {
+            folder: 'resume',
+            resource_type: 'raw',
+            overwrite: true
+        })
+        user.resume = uploadResponse.secure_url;
+    }
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User Updated Successfully',
+      user: updatedUser
+    });
+  } catch (err) {
+    console.log('Update Failed!', err);
+    res.status(500).json({ success: false, message: 'Failed to update user' });
+  }
+};
 
 const checkUser = async (req, res) => {
     try {

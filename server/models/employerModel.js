@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const employerSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 
+  profilePic: { type: String },
+
   companyName: { type: String, required: true },
+  
   industry: String,
   website: String,
   location: String,
