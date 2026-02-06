@@ -11,6 +11,11 @@ const jobSchema = new mongoose.Schema({
   description: { type: String, required: true },
   requirements: [String],
 
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+  },
+
   location: String,
 
   jobType: {
@@ -19,15 +24,19 @@ const jobSchema = new mongoose.Schema({
   },
 
   salary: {
-    min: Number,
-    max: Number,
+    min: { type: Number, min: 0 },
+    max: { type: Number, min: 0 },
+  },
+
+  status: {
+    type: String,
+    enum: ["open", "closed", "paused"],
+    default: "open"
   },
 
   applications: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Application" }
   ],
-
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Job", jobSchema);

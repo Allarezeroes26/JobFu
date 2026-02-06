@@ -168,7 +168,6 @@ const Profile = () => {
             </CardContent>
           </Card>
           
-          {/* CONTACT INFO CARD */}
           <Card>
             <CardHeader><CardTitle className="text-sm font-semibold uppercase text-muted-foreground">Contact Info</CardTitle></CardHeader>
             <CardContent className="space-y-4">
@@ -178,7 +177,6 @@ const Profile = () => {
           </Card>
         </div>
 
-        {/* MAIN CONTENT */}
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader><CardTitle>Professional Summary</CardTitle></CardHeader>

@@ -7,6 +7,8 @@ import Register from './pages/Register'
 import { userAuth } from './stores/userStores'
 import { useEffect } from 'react'
 import Profile from './pages/Profile'
+import Jobs from './pages/Jobs'
+import PostJob from './pages/PostJob'
 
 
 function App() {
@@ -32,7 +34,7 @@ function App() {
       children: [
         {
           index: true,
-          element: authUser ? <Homepage/> : <Navigate to='/login'/>
+          element: <Homepage/>
         },
         {
           path: '/login',
@@ -45,6 +47,14 @@ function App() {
         {
           path: '/profile',
           element: authUser? <Profile/> : <Navigate to='/login'/>
+        },
+        {
+          path: '/jobs',
+          element: authUser ? <Jobs/> : <Navigate to='/login'/>
+        },
+        {
+          path: '/post-job',
+          element: authUser ? <PostJob/> : <Navigate to='/login'/>
         }
       ]
     }

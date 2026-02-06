@@ -23,26 +23,27 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
-        
-        <div className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-lg">
-              <BriefcaseBusiness className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="cursor-default text-xl font-bold tracking-tight">
-              JobFu
-            </span>
-        </div>
+        <Link to='/'>
+          <div className="flex items-center gap-2">
+              <div className="bg-primary p-1.5 rounded-lg">
+                <BriefcaseBusiness className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <span className="cursor-default text-xl font-bold tracking-tight">
+                JobFu
+              </span>
+          </div>
+        </Link>
 
-        <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <Button variant='link'>Find Jobs</Button>
+        {authUser ? <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <Link to='/jobs'><Button variant='link'>Find Jobs</Button></Link>
           <Button variant='link'>Companies</Button>
           <Button variant='link'>My Activity</Button>
-        </div>
+        </div> : ""}
 
         <div className="flex items-center gap-4">
           {authUser ? (
             <>
-              <Button variant="ghost" className="hidden md:flex">Post a Job</Button>
+              <Link className="hidden md:flex" to='/post-job'><Button variant="ghost">Post a Job</Button></Link>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -72,9 +73,11 @@ const Navbar = () => {
             </div>
           )}
           
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-6 w-6" />
-          </Button>
+          { authUser ? (
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <Menu className="h-6 w-6" />
+            </Button>
+          ) : "" }
         </div>
       </div>
     </nav>
