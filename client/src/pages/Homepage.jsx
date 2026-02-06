@@ -53,7 +53,7 @@ const Homepage = () => {
               EASY WAY TO GET YOUR <span className="text-primary">DREAM JOB</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-[500px]">
-              Explore thousands of job opportunities with all the information you need. It's your future. Let's find it together.
+              Explore thousands of job opportunities with <span className='font-bold'>JobFu</span>. It's your future. Let's find it together.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-2 p-2 border rounded-xl bg-card shadow-xl mt-8">

@@ -1,13 +1,21 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Plus, X } from "lucide-react"
+import { Plus, X, AlertCircle, Lock } from "lucide-react" // Added icons
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert" // Added Alert
+import { jobStore } from '../stores/jobStores'
+import { employeeStore } from '@/stores/employerStores'
 
 const PostJob = () => {
+
+  const { jobPost } = jobStore()
+  const { checkEmployer, checkingEmployer, employeeData } = employeeStore()
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -33,7 +41,7 @@ const PostJob = () => {
     setFormData({ ...formData, requirements: updated })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const finalData = {
       title: formData.title,
@@ -44,7 +52,44 @@ const PostJob = () => {
       category: [{ categoryName: formData.categoryName }],
       requirements: formData.requirements
     }
+
+    await jobPost(finalData)
     console.log("Submitting to MongoDB:", finalData)
+  }
+
+  useEffect(() => {
+    checkEmployer()
+  }, [checkEmployer])
+
+  if (checkingEmployer) {
+    return (
+      <div className="container mx-auto py-10 text-center text-muted-foreground">
+        Checking employer account...
+      </div>
+    )
+  }
+
+  if (!employeeData) {
+    return (
+      <div className="container mx-auto py-10 px-4 max-w-3xl">
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Action Restricted</AlertTitle>
+          <AlertDescription>
+            You must have a Employer account to post new job listings.
+          </AlertDescription>
+        </Alert>
+        <Card className="opacity-50 pointer-events-none select-none">
+          <CardHeader className="text-center">
+            <Lock className="mx-auto mb-2 text-muted-foreground" />
+            <CardTitle>Employer Access Only</CardTitle>
+          </CardHeader>
+          <CardContent className="h-40 flex items-center justify-center italic text-muted-foreground">
+            Form content is hidden...
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
