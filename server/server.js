@@ -4,6 +4,8 @@ const dotenv = require('dotenv').config()
 const cookieparser = require('cookie-parser');
 const connectDB = require('./db/db');
 const userRoutes = require('./routes/userRoutes')
+const jobRoutes = require('./routes/jobRoute')
+const employerRoutes = require('./routes/employeeRoutes')
 
 const app = express()
 
@@ -19,6 +21,8 @@ app.use(cors({
 }))
 
 app.use('/api/auth/', userRoutes)
+app.use('/api/jobs/', jobRoutes)
+app.use('/api/employer/', employerRoutes)
 
 app.listen(port, () => {
     console.log(`Server running in port ${port}`)
