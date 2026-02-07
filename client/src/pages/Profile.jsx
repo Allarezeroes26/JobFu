@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 
 const Profile = () => {
-  const { authUser, isChecking, update } = userAuth()
+  const { authUser, isChecking, update, isDeleting, deleteAccount } = userAuth()
   const fileInputRef = useRef()
   const [previewPic, setPreviewPic] = useState(null)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -63,6 +63,10 @@ const Profile = () => {
     )
   }
 
+  const handleDelete = async () => {
+    await deleteAccount(authUser._id)
+  }
+  
   const initials = `${authUser?.firstName?.[0] || ""}${authUser?.lastName?.[0] || ""}`.toUpperCase();
 
   return (
@@ -213,6 +217,12 @@ const Profile = () => {
                 )}
               </CardContent>
             </Card>
+          </div>
+          <div className='flex flex-col w-full gap-2'>
+            <Button variant='default' className='bg-orange-400 hover:bg-orange-200'>Make Employer Profile</Button>
+            <Button variant='default' onClick={handleDelete} disabled={isDeleting} className='bg-red-400 hover:bg-red-200' >
+              {isDeleting ? 'Deleting...' : 'Delete Profile'}
+            </Button>          
           </div>
         </div>
       </div>

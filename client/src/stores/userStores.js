@@ -8,6 +8,7 @@ export const userAuth = create((set) => ({
     isLogging: false,
     isRegistering: false,
     isUpdating: false,
+    isDeleting: false,
 
     checkUser: async () => {
 
@@ -72,9 +73,25 @@ export const userAuth = create((set) => ({
             set({ authUser: res.data.user })
             toast.success('Account successfully updated!')
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Something went wrong!')
+            const message = err.response?.data?.message || err.message || 'Something went wrong!'
+            toast.error(message)
         } finally {
             set({ isUpdating: false })
+        }
+    },
+
+    deleteAccount: async (id) => {
+        set({ isDeleting: true })
+
+        try {
+            await api.delete(`/api/auth/delete/${id}`)
+            set({ authUser: null })
+            toast.success('Account deleted successfully')
+        } catch (err) {
+            const message = err.response?.data?.message || err.message || "Something went wrong!"
+            toast.error(message)
+        } finally {
+            set({ isDeleting: false })
         }
     }
 }))
