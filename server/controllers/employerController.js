@@ -55,7 +55,6 @@ const createEmployer = async (req, res) => {
       })
     }
 
-    // 👇 HANDLE FILE
     const profilePicFile = req.files?.profilePic?.[0]
     let profilePicUrl = undefined
 
@@ -132,7 +131,6 @@ const employerUpdate = async (req, res) => {
     }
 
     const {
-      profilePic,
       companyName,
       industry,
       website,
@@ -140,12 +138,23 @@ const employerUpdate = async (req, res) => {
       description
     } = req.body
 
-    if (profilePic !== undefined) employer.profilePic = profilePic
     if (companyName !== undefined) employer.companyName = companyName
     if (industry !== undefined) employer.industry = industry
     if (website !== undefined) employer.website = website
     if (location !== undefined) employer.location = location
     if (description !== undefined) employer.description = description
+
+    // ✅ IMAGE FILE
+    const profilePicFile = req.files?.profilePic?.[0]
+
+    if (profilePicFile) {
+      const result = await uploadToCloudinary(
+        profilePicFile.buffer,
+        'employer_logos',
+        'image'
+      )
+      employer.profilePic = result.secure_url
+    }
 
     const updatedEmployer = await employer.save()
 

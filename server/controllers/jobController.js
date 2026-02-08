@@ -27,8 +27,10 @@ const postJob = async (req, res) => {
       salary
     });
 
-    employer.jobs.push(job._id);
-    await employer.save();
+    if (!employer.jobs) employer.jobs = []
+    employer.jobs.push(job._id)
+    await employer.save()
+
 
     res.status(201).json({
       success: true,
@@ -72,4 +74,62 @@ const deleteJob = async (req, res) => {
   }
 }
 
-module.exports = { postJob, deleteJob };
+const fetchJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({})
+    res.status(200).json({ success: true, message: "Fetched All Jobs", jobs })
+  } catch (err) {
+    console.log('Error: ', err)
+    res.status(500).json({ success: false, message: 'Error fetching jobs' })
+  }
+}
+
+const fetchEmployerJobs = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const employer = await Employer.findOne({ user: userId });
+
+    if (!employer) {
+      return res.status(404).json({
+        success: false,
+        message: "Employer profile not found"
+      })
+    }
+
+    const jobs = await Job.find({ employer: employer._id }).sort({ createdAt: -1 })
+
+    res.status(200).json({ success: true, message: "Fetched your jobs", jobs })
+  } catch (err) {
+    console.log('Error fetching employer jobs: ', err)
+    res.status(500).json({
+      success: false, message: "Failed to fetch jobs"
+    })
+  }
+}
+
+const fetchJobById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await Job.findById(id)
+
+    if (!job) {
+      return res.status(404).json({
+        success: false,
+        message: 'Job not found'
+      })
+    }
+
+    res.status(200).json({
+      success: true, job
+    })
+  } catch (err) {
+    console.log('Error getting Job', err)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch job'
+    })
+  }
+}
+
+module.exports = { postJob, deleteJob, fetchJobs, fetchEmployerJobs, fetchJobById };

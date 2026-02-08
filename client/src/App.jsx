@@ -10,14 +10,17 @@ import Profile from './pages/Profile'
 import Jobs from './pages/Jobs'
 import PostJob from './pages/PostJob'
 import EmployerForm from './pages/employerForm'
-
+import {employeeStore} from './stores/employerStores'
+import EmployerDashboard from './pages/EmployerDashboard'
 
 function App() {
 
   const { checkUser, isChecking, authUser } = userAuth()
+  const { checkEmployer } = employeeStore() 
 
   useEffect(() => {
     checkUser()
+    checkEmployer()
   }, [])
 
   if (isChecking) {
@@ -60,6 +63,10 @@ function App() {
         {
           path: '/employer-form',
           element: authUser ? <EmployerForm /> : <Navigate to='/login'/>
+        },
+        {
+          path: '/employer-dashboard',
+          element: authUser ? <EmployerDashboard/> : <Navigate to='/login'/>
         }
       ]
     }

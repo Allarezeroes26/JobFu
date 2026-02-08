@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Field, FieldGroup } from '@/components/ui/field'
 import { useNavigate } from 'react-router-dom'
+import { employeeStore } from '@/stores/employerStores'
 import { userAuth } from '../stores/userStores'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,6 +18,7 @@ import {
 
 const Profile = () => {
   const { authUser, isChecking, update, isDeleting, deleteAccount } = userAuth()
+  const { employeeData, checkEmployer } = employeeStore()
   const fileInputRef = useRef()
   const [previewPic, setPreviewPic] = useState(null)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -69,7 +71,15 @@ const Profile = () => {
   const handleDelete = async () => {
     await deleteAccount(authUser._id);
   }
+
+  useEffect(() => {
+    if (authUser?._id) {
+      checkEmployer(authUser._id)
+    }
+  }, [authUser?._id])
   
+  const hasEmployerProfile = Boolean(employeeData)
+
   const initials = `${authUser?.firstName?.[0] || ""}${authUser?.lastName?.[0] || ""}`.toUpperCase();
 
   return (
@@ -179,7 +189,7 @@ const Profile = () => {
             <CardHeader><CardTitle className="text-sm font-semibold uppercase text-muted-foreground">Contact Info</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3 text-sm"><Mail className="h-4 w-4 text-primary" /> <span>{authUser?.email}</span></div>
-              <div className="flex items-center gap-3 text-sm"><Briefcase className="h-4 w-4 text-primary" /> <span>Open to Work</span></div>
+              <div className="flex items-center gap-3 text-sm"><Briefcase className="h-4 w-4 text-primary" /> <span>{ employeeData ? 'Employer' : 'Open to Work' }</span></div>
             </CardContent>
           </Card>
         </div>
@@ -222,7 +232,19 @@ const Profile = () => {
             </Card>
           </div>
           <div className='flex flex-col w-full gap-2'>
-            <Button className='bg-orange-400 hover:bg-orange-200' onClick={() => navigate('/employer-form')} variant='default'>Make Employer Profile</Button>
+            <Button
+              disabled={hasEmployerProfile}
+              onClick={() => navigate('/employer-form')}
+              className={
+                hasEmployerProfile
+                  ? 'bg-slate-400 line-through font-black hover:bg-slate-400'
+                  : 'bg-orange-400 hover:bg-orange-200'
+              }
+            >
+              {hasEmployerProfile
+                ? 'Employer Profile already made!'
+                : 'Make Employer Profile'}
+            </Button>
             <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="default" className='bg-red-400 hover:bg-red-200'>Delete Account</Button>
