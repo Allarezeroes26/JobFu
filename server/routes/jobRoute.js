@@ -4,7 +4,7 @@ const { postJob, deleteJob, fetchJobs, fetchEmployerJobs, fetchJobById } = requi
 const authUpdate = require('../middleware/authMiddleware') 
 
 router.post('/post-job', authUpdate, postJob)
-router.delete('/delete-job', authUpdate, deleteJob)
+router.delete('/delete-job/:id', authUpdate, deleteJob)
 router.get('/all-jobs', authUpdate, fetchJobs)
 router.get('/my-jobs', authUpdate, fetchEmployerJobs)
 router.get('/job/:id', authUpdate, fetchJobById)
