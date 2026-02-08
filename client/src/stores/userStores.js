@@ -29,7 +29,7 @@ export const userAuth = create((set) => ({
 
         try {
             const response = await api.post('/api/auth/login', { email, password })
-            set({ authUser: response.data })
+            set({ authUser: response.data.user })
             toast.success('Login Successful')
         } catch (err) {
             const message = err.response?.data?.message || err.message || 'Something went wrong'

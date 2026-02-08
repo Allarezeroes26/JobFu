@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 import Profile from './pages/Profile'
 import Jobs from './pages/Jobs'
 import PostJob from './pages/PostJob'
+import EmployerForm from './pages/employerForm'
 
 
 function App() {
@@ -55,6 +56,10 @@ function App() {
         {
           path: '/post-job',
           element: authUser ? <PostJob/> : <Navigate to='/login'/>
+        },
+        {
+          path: '/employer-form',
+          element: authUser ? <EmployerForm /> : <Navigate to='/login'/>
         }
       ]
     }

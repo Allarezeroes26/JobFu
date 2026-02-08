@@ -1,5 +1,32 @@
 const Employer = require('../models/employerModel')
 const User = require('../models/userModel')
+const cloudinary = require('../utils/cloudinary')
+const streamifier = require('streamifier')
+
+const uploadToCloudinary = (buffer, folder, resource_type = 'image', originalName) => {
+  return new Promise((resolve, reject) => {
+    let finalPublicId = undefined;
+    if (originalName) {
+      finalPublicId = (resource_type === 'raw') ? originalName : originalName.replace(/\.[^/.]+$/, "");
+    }
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type,
+        overwrite: true,
+        public_id: finalPublicId,
+        use_filename: true,
+        unique_filename: false
+      }, (err, result) => {
+        if(err) reject(err);
+        else resolve(result);
+      }
+    );
+
+    streamifier.createReadStream(buffer).pipe(uploadStream)
+  })
+}
 
 const createEmployer = async (req, res) => {
   try {
@@ -14,7 +41,6 @@ const createEmployer = async (req, res) => {
     }
 
     const {
-      profilePic,
       companyName,
       industry,
       website,
@@ -29,7 +55,28 @@ const createEmployer = async (req, res) => {
       })
     }
 
-    const employer = await Employer.create({ user: userId, profilePic, companyName, industry, website, location, description })
+    // 👇 HANDLE FILE
+    const profilePicFile = req.files?.profilePic?.[0]
+    let profilePicUrl = undefined
+
+    if (profilePicFile) {
+      const result = await uploadToCloudinary(
+        profilePicFile.buffer,
+        'employer_logos',
+        'image'
+      )
+      profilePicUrl = result.secure_url
+    }
+
+    const employer = await Employer.create({
+      user: userId,
+      profilePic: profilePicUrl,
+      companyName,
+      industry,
+      website,
+      location,
+      description
+    })
 
     await User.findByIdAndUpdate(userId, { role: 'employer' })
 

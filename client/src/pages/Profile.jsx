@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react'
+import { Field, FieldGroup } from '@/components/ui/field'
+import { useNavigate } from 'react-router-dom'
 import { userAuth } from '../stores/userStores'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +20,7 @@ const Profile = () => {
   const fileInputRef = useRef()
   const [previewPic, setPreviewPic] = useState(null)
   const [isUpdating, setIsUpdating] = useState(false)
+  const navigate = useNavigate()
 
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0]
@@ -64,7 +67,7 @@ const Profile = () => {
   }
 
   const handleDelete = async () => {
-    await deleteAccount(authUser._id)
+    await deleteAccount(authUser._id);
   }
   
   const initials = `${authUser?.firstName?.[0] || ""}${authUser?.lastName?.[0] || ""}`.toUpperCase();
@@ -219,10 +222,29 @@ const Profile = () => {
             </Card>
           </div>
           <div className='flex flex-col w-full gap-2'>
-            <Button variant='default' className='bg-orange-400 hover:bg-orange-200'>Make Employer Profile</Button>
-            <Button variant='default' onClick={handleDelete} disabled={isDeleting} className='bg-red-400 hover:bg-red-200' >
-              {isDeleting ? 'Deleting...' : 'Delete Profile'}
-            </Button>          
+            <Button className='bg-orange-400 hover:bg-orange-200' onClick={() => navigate('/employer-form')} variant='default'>Make Employer Profile</Button>
+            <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="default" className='bg-red-400 hover:bg-red-200'>Delete Account</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-sm">
+                  <DialogHeader>
+                    <DialogTitle>Delete Account?</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete this account?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button variant='default' onClick={handleDelete} disabled={isDeleting} className='bg-red-400 hover:bg-red-200' >
+                      {isDeleting ? 'Deleting...' : 'Delete Profile'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            
           </div>
         </div>
       </div>
