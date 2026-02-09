@@ -77,10 +77,13 @@ const deleteJob = async (req, res) => {
 const fetchJobs = async (req, res) => {
   try {
     const jobs = await Job.find({})
-    res.status(200).json({ success: true, message: "Fetched All Jobs", jobs })
+      .populate('employer', 'companyName') 
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, message: "Fetched All Jobs", jobs });
   } catch (err) {
-    console.log('Error: ', err)
-    res.status(500).json({ success: false, message: 'Error fetching jobs' })
+    console.log('Error: ', err);
+    res.status(500).json({ success: false, message: 'Error fetching jobs' });
   }
 }
 
@@ -111,24 +114,24 @@ const fetchJobById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const job = await Job.findById(id)
+    const job = await Job.findById(id).populate('employer', 'companyName');
 
     if (!job) {
       return res.status(404).json({
         success: false,
         message: 'Job not found'
-      })
+      });
     }
 
     res.status(200).json({
       success: true, job
-    })
+    });
   } catch (err) {
-    console.log('Error getting Job', err)
+    console.log('Error getting Job', err);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch job'
-    })
+    });
   }
 }
 

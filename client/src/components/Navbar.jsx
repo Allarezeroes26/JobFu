@@ -51,7 +51,7 @@ const Navbar = () => {
 
         {authUser ? <div className="hidden md:flex items-center gap-6 text-sm font-medium">
           <Link to='/jobs'><Button variant='link'>Find Jobs</Button></Link>
-          <Button variant='link'>Companies</Button>
+          <Link to='/companies'><Button variant='link'>Companies</Button></Link>
           <Button variant='link'>My Activity</Button>
         </div> : ""}
 
@@ -124,10 +124,12 @@ const Navbar = () => {
                         Find Jobs
                       </Button>
                     </Link>
-                    <Button variant="ghost" className="w-full justify-start gap-3 h-11 px-4 hover:bg-primary/5 hover:text-primary">
-                      <Building2 className="h-4 w-4" />
-                      Companies
-                    </Button>
+                    <Link to='/companies'>
+                      <Button variant="ghost" className="w-full justify-start gap-3 h-11 px-4 hover:bg-primary/5 hover:text-primary">
+                        <Building2 className="h-4 w-4" />
+                        Companies
+                      </Button>
+                    </Link>
                     <Button variant="ghost" className="w-full justify-start gap-3 h-11 px-4 hover:bg-primary/5 hover:text-primary">
                       <History className="h-4 w-4" />
                       My Activity

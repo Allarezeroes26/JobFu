@@ -13,6 +13,7 @@ import EmployerForm from './pages/employerForm'
 import {employeeStore} from './stores/employerStores'
 import EmployerDashboard from './pages/EmployerDashboard'
 import Job from './pages/Job'
+import Companies from './pages/Companies'
 
 function App() {
 
@@ -72,6 +73,10 @@ function App() {
         {
           path: '/job/:id',
           element: authUser ? <Job/> : <Navigate to='/login'/>
+        },
+        {
+          path: '/companies',
+          element: authUser ? <Companies /> : <Navigate to='/login'/>
         }
       ]
     }
