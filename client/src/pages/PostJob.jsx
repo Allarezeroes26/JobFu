@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, X, AlertCircle, Lock, Loader2 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ScrollArea } from "@/components/ui/scroll-area" // Recommended for long modal forms
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { jobStore } from '../stores/jobStores'
 import { employeeStore } from '@/stores/employerStores'
 

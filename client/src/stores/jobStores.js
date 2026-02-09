@@ -1,3 +1,7 @@
+import { create } from "zustand"
+import api from "@/api/api"
+import {toast} from "react-hot-toast"
+
 export const jobStore = create((set) => ({
   jobs: [],
   employerJobs: [],

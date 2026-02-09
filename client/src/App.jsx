@@ -12,6 +12,7 @@ import PostJob from './pages/PostJob'
 import EmployerForm from './pages/employerForm'
 import {employeeStore} from './stores/employerStores'
 import EmployerDashboard from './pages/EmployerDashboard'
+import Job from './pages/Job'
 
 function App() {
 
@@ -67,6 +68,10 @@ function App() {
         {
           path: '/employer-dashboard',
           element: authUser ? <EmployerDashboard/> : <Navigate to='/login'/>
+        },
+        {
+          path: '/job/:id',
+          element: authUser ? <Job/> : <Navigate to='/login'/>
         }
       ]
     }

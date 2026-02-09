@@ -46,7 +46,6 @@ const EmployerForm = () => {
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
       
-      {/* LEFT */}
       <div className="hidden lg:flex relative bg-primary items-center justify-center p-12 overflow-hidden">
         <img
           src={EmployeeBG}
@@ -75,7 +74,6 @@ const EmployerForm = () => {
         </div>
       </div>
 
-      {/* RIGHT */}
       <div className="flex items-center justify-center p-6 bg-muted/20">
         <Card className="w-full max-w-xl shadow-xl">
           <CardHeader>
@@ -88,7 +86,6 @@ const EmployerForm = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
 
-              {/* LOGO */}
               <div className="flex flex-col items-center gap-3">
                 <div
                   className="w-24 h-24 rounded-2xl bg-muted border-2 border-dashed flex items-center justify-center relative overflow-hidden cursor-pointer"
@@ -112,7 +109,6 @@ const EmployerForm = () => {
                 </Label>
               </div>
 
-              {/* COMPANY NAME */}
               <div className="grid gap-2">
                 <Label htmlFor="companyName">Company Name</Label>
                 <div className="relative">
@@ -127,7 +123,6 @@ const EmployerForm = () => {
                 </div>
               </div>
 
-              {/* INDUSTRY + LOCATION */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="industry">Industry</Label>
@@ -148,7 +143,6 @@ const EmployerForm = () => {
                 </div>
               </div>
 
-              {/* WEBSITE */}
               <div className="grid gap-2">
                 <Label htmlFor="website">Website</Label>
                 <div className="relative">
@@ -163,7 +157,6 @@ const EmployerForm = () => {
                 </div>
               </div>
 
-              {/* DESCRIPTION */}
               <div className="grid gap-2">
                 <Label htmlFor="description">About the Company</Label>
                 <Textarea
