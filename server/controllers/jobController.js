@@ -93,22 +93,26 @@ const fetchEmployerJobs = async (req, res) => {
     const employer = await Employer.findOne({ user: userId });
 
     if (!employer) {
-      return res.status(404).json({
-        success: false,
-        message: "Employer profile not found"
-      })
+      return res.status(404).json({ success: false, message: "Employer profile not found" });
     }
 
-    const jobs = await Job.find({ employer: employer._id }).sort({ createdAt: -1 })
+    const jobs = await Job.find({ employer: employer._id })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'applications',
+        populate: {
+          path: 'applicant',
+          model: 'User',
+          select: 'firstName lastName email profilePic address description skills education experience projects contacts resume resumeName' 
+        }
+      });
 
-    res.status(200).json({ success: true, message: "Fetched your jobs", jobs })
+    res.status(200).json({ success: true, message: "Fetched your jobs", jobs });
   } catch (err) {
-    console.log('Error fetching employer jobs: ', err)
-    res.status(500).json({
-      success: false, message: "Failed to fetch jobs"
-    })
+    console.log('Error fetching employer jobs: ', err);
+    res.status(500).json({ success: false, message: "Failed to fetch jobs" });
   }
-}
+};
 
 const fetchJobById = async (req, res) => {
   try {

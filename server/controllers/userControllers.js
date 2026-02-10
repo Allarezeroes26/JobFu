@@ -107,21 +107,38 @@ const uploadToCloudinary = (buffer, folder, resource_type = 'image', originalNam
 };
 
 const updateUser = async (req, res) => {
-  const { firstName, lastName, email, address, description, skills, education } = req.body;
+  const { firstName, lastName, email, address, description, skills, education, links, experience, projects } = req.body;
   const profilePicFile = req.files?.profilePic?.[0];
   const resumeFile = req.files?.resume?.[0];
 
   try {
     const user = await User.findById(req.user._id).select('+password');
     if (!user) return res.status(404).json({ success: false, message: "User doesn't exist" });
-
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
     if (email) user.email = email;
     if (address) user.address = address;
     if (description) user.description = description;
-    if (skills) user.skills = skills.split(',').map(s => s.trim());
     if (education) user.education = education;
+    if (links) user.links = links ;
+    if (skills) {
+      user.skills = skills.split(',').map(s => s.trim());
+    }
+    if (experience) {
+      try {
+        user.experience = JSON.parse(experience);
+      } catch (e) {
+        console.error("Experience parse error:", e);
+      }
+    }
+
+    if (projects) {
+      try {
+        user.projects = JSON.parse(projects);
+      } catch (e) {
+        console.error("Projects parse error:", e);
+      }
+    }
 
     if (profilePicFile) {
       const result = await uploadToCloudinary(profilePicFile.buffer, 'profile_pics', 'image');
@@ -129,26 +146,28 @@ const updateUser = async (req, res) => {
     }
 
     if (resumeFile) {
-    const path = require('path');
-    const fileExt = path.extname(resumeFile.originalname);
-    const sanitizeFileName = (name) => {
+      const path = require('path');
+      const fileExt = path.extname(resumeFile.originalname);
+      
+      const sanitizeFileName = (name) => {
         const base = name.replace(/\.[^/.]+$/, "");
         const cleanBase = base.replace(/[^a-zA-Z0-9-_]/g, "_").substring(0, 50);
         return cleanBase + fileExt; 
-    };
+      };
 
-    const publicIdWithExt = sanitizeFileName(resumeFile.originalname);
+      const publicIdWithExt = sanitizeFileName(resumeFile.originalname);
 
-    const result = await uploadToCloudinary(
+      const result = await uploadToCloudinary(
         resumeFile.buffer,
         'resume',
         'raw',
         publicIdWithExt
-    );
+      );
 
-    user.resume = result.secure_url;
-    user.resumeName = resumeFile.originalname;
+      user.resume = result.secure_url;
+      user.resumeName = resumeFile.originalname;
     }
+
     const updatedUser = await user.save();
 
     res.status(200).json({
@@ -161,7 +180,6 @@ const updateUser = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update user' });
   }
 };
-
 
 const checkUser = async (req, res) => {
     try {
