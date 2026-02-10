@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { 
   Users, Briefcase, TrendingUp, Plus, MoreVertical, 
   ArrowUpRight, Clock, MapPin, Loader2, Trash, Edit, 
-  Lightbulb, Building2, ExternalLink, Mail, CheckCircle2
+  Lightbulb, Building2, ExternalLink, Mail, CheckCircle2, Camera
 } from "lucide-react"
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup, 
@@ -15,29 +15,31 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, 
   DialogDescription, DialogFooter, DialogClose, DialogTrigger 
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { jobStore } from '@/stores/jobStores'
 import { employeeStore } from '../stores/employerStores'
+import { useNavigate } from 'react-router-dom'
 import PostJob from './PostJob'
 
 const EmployerDashboard = () => {
   const { employerJobs, currentEmployerJobs, loadingEmployerJobs, deleteJob } = jobStore();
-  const { employeeData, checkEmployer, checkingEmployer } = employeeStore();
+  const { employeeData, checkEmployer, updateEmployer, updatingEmployer } = employeeStore();
 
   const [editingJob, setEditingJob] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
 
   useEffect(() => {
     currentEmployerJobs();
-    checkEmployer(); // Fetch company profile
+    checkEmployer(); 
   }, []);
 
-  // Logical Helpers
   const totalApplicants = employerJobs.reduce((acc, job) => acc + (job.applications?.length || 0), 0);
   const activeJobs = employerJobs.filter(job => job.status === 'open').length;
-  const recentApplicants = employerJobs
-    .flatMap(job => job.applications.map(app => ({ ...app, jobTitle: job.title })))
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5); // Get top 5 recent
+  
+  const navigate = useNavigate()
 
   const stats = [
     { title: "Active Listings", value: activeJobs, icon: Briefcase, color: "text-blue-600", bg: "bg-blue-100" },
@@ -50,11 +52,17 @@ const EmployerDashboard = () => {
     await deleteJob(id)
   }
 
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    
+    const success = await updateEmployer(formData);
+    setIsProfileDialogOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-muted/20 p-4 md:p-10">
       <div className="container mx-auto max-w-7xl space-y-8">
-        
-        {/* TOP NAV / WELCOME */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">
@@ -80,8 +88,6 @@ const EmployerDashboard = () => {
             </Dialog>
           </div>
         </div>
-
-        {/* QUICK STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
             <Card key={i} className="border-none shadow-sm">
@@ -99,8 +105,6 @@ const EmployerDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* MAIN COLUMN: LISTINGS */}
           <div className="lg:col-span-8 space-y-6">
             <Card className="border-none shadow-sm overflow-hidden">
               <CardHeader className="bg-white border-b flex flex-row items-center justify-between">
@@ -122,7 +126,11 @@ const EmployerDashboard = () => {
                       </div>
                     )}
                     {employerJobs.map((job) => (
-                      <div key={job._id} className="p-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                      <div 
+                        key={job._id} 
+                        onClick={() => navigate(`/employer-jobs/${job._id}`)}
+                        className="p-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors cursor-pointer"
+                      >
                         <div className="space-y-1">
                           <h4 className="font-semibold text-slate-800">{job.title}</h4>
                           <div className="flex gap-4 text-xs text-muted-foreground">
@@ -154,16 +162,16 @@ const EmployerDashboard = () => {
               </CardContent>
             </Card>
           </div>
-
-          {/* SIDEBAR COLUMN */}
           <div className="lg:col-span-4 space-y-6">
-            
-            {/* COMPANY PROFILE CARD */}
             <Card className="border-none shadow-sm bg-slate-900 text-white overflow-hidden">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded bg-white/10 flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-white" />
+                  <div className="h-12 w-12 rounded bg-white overflow-hidden flex items-center justify-center border-2 border-white/20">
+                    {employeeData?.profilePic ? (
+                        <img src={employeeData.profilePic} alt="logo" className="w-full h-full object-cover" />
+                    ) : (
+                        <Building2 className="w-6 h-6 text-slate-900" />
+                    )}
                   </div>
                   <div>
                     <CardTitle className="text-lg">{employeeData?.companyName || "Company Profile"}</CardTitle>
@@ -180,54 +188,104 @@ const EmployerDashboard = () => {
                       <p className="text-slate-400">Location</p>
                       <p>{employeeData?.location || "Remote"}</p>
                    </div>
-                   <Button variant="link" className="text-white p-0 h-auto text-xs">Edit Profile</Button>
+                   <Button 
+                    variant="link" 
+                    onClick={() => setIsProfileDialogOpen(true)}
+                    className="text-blue-400 p-0 h-auto text-xs hover:text-blue-300"
+                   >
+                    Edit Profile
+                   </Button>
                 </div>
               </CardContent>
             </Card>
-
-            {/* RECENT APPLICANTS */}
-            <Card className="border-none shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Recent Applicants</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border">
-                  {recentApplicants.length > 0 ? recentApplicants.map((app, i) => (
-                    <div key={i} className="p-4 flex items-center gap-3 hover:bg-slate-50 transition-colors">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                        {app.userName?.charAt(0) || "A"}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate">{app.userName || "Anonymous"}</p>
-                        <p className="text-xs text-muted-foreground truncate">Applied for {app.jobTitle}</p>
-                      </div>
-                      <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                  )) : (
-                    <div className="p-8 text-center text-xs text-muted-foreground">No recent applications</div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* TIP OF THE DAY */}
-            <Card className="border-none shadow-sm bg-amber-50 border border-amber-100">
-              <CardContent className="p-4 flex gap-3">
-                <Lightbulb className="w-5 h-5 text-amber-600 shrink-0" />
-                <div className="space-y-1">
-                  <p className="text-xs font-bold text-amber-900 uppercase">Hiring Tip</p>
-                  <p className="text-xs text-amber-800 leading-relaxed">
-                    Personalized rejection emails improve your employer brand rating by 20%.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
           </div>
         </div>
       </div>
 
-      {/* EDIT MODAL */}
+      <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <form onSubmit={handleProfileUpdate}>
+            <DialogHeader>
+              <DialogTitle>Edit Company Profile</DialogTitle>
+              <DialogDescription>
+                Update your company identity and contact information.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 py-6">
+              <div className="grid gap-2">
+                <Label htmlFor="companyName">Company Name</Label>
+                <Input 
+                    id="companyName" 
+                    name="companyName" 
+                    defaultValue={employeeData?.companyName} 
+                    required 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="industry">Industry</Label>
+                  <Input 
+                    id="industry" 
+                    name="industry" 
+                    defaultValue={employeeData?.industry} 
+                    placeholder="e.g. Technology" 
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Input 
+                    id="location" 
+                    name="location" 
+                    defaultValue={employeeData?.location} 
+                    placeholder="e.g. New York, USA" 
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="description">Company Bio</Label>
+                <Textarea 
+                    id="description" 
+                    name="description" 
+                    defaultValue={employeeData?.description} 
+                    placeholder="Tell candidates about your company culture..." 
+                    className="min-h-[100px] resize-none"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="logo">Company Logo</Label>
+                <div className="flex items-center gap-4">
+                    <Input 
+                        id="logo" 
+                        name="profilePic" 
+                        type="file" 
+                        accept="image/*" 
+                        className="cursor-pointer flex-1"
+                    />
+                    {employeeData?.profilePic && (
+                        <Badge variant="secondary">Current Logo Active</Badge>
+                    )}
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="border-t pt-4">
+              <DialogClose asChild>
+                <Button type="button" variant="ghost">Cancel</Button>
+              </DialogClose>
+              <Button type="submit" disabled={updatingEmployer} className="min-w-[100px]">
+                {updatingEmployer ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving</>
+                ) : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>

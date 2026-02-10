@@ -173,8 +173,28 @@ const employerUpdate = async (req, res) => {
   }
 }
 
+
+const allEmployer = async (req, res) => {
+  try {
+    const employers = await Employer.find({}).sort({ createdAt: -1 }); 
+    
+    res.status(200).json({ 
+      success: true, 
+      message: "Fetched all employers", 
+      employers 
+    });
+  } catch (err) {
+    console.error('Error fetching all employers', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error fetching all employers' 
+    });
+  }
+}
+
 module.exports = {
   createEmployer,
   getMyEmployer,
-  employerUpdate
+  employerUpdate,
+  allEmployer
 }

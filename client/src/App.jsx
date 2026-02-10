@@ -14,11 +14,13 @@ import {employeeStore} from './stores/employerStores'
 import EmployerDashboard from './pages/EmployerDashboard'
 import Job from './pages/Job'
 import Companies from './pages/Companies'
+import Company from './pages/Company'
+import EmployerJobs from './pages/EmployerJobs'
 
 function App() {
 
   const { checkUser, isChecking, authUser } = userAuth()
-  const { checkEmployer } = employeeStore() 
+  const { checkEmployer, employeeData } = employeeStore() 
 
   useEffect(() => {
     checkUser()
@@ -60,7 +62,7 @@ function App() {
         },
         {
           path: '/post-job',
-          element: authUser ? <PostJob/> : <Navigate to='/login'/>
+          element: authUser && employeeData ? <PostJob/> : <Navigate to='/login'/>
         },
         {
           path: '/employer-form',
@@ -68,7 +70,7 @@ function App() {
         },
         {
           path: '/employer-dashboard',
-          element: authUser ? <EmployerDashboard/> : <Navigate to='/login'/>
+          element: authUser && employeeData ? <EmployerDashboard/> : <Navigate to='/login'/>
         },
         {
           path: '/job/:id',
@@ -77,6 +79,14 @@ function App() {
         {
           path: '/companies',
           element: authUser ? <Companies /> : <Navigate to='/login'/>
+        },
+        {
+          path: '/company/:id',
+          element: authUser ? <Company/> : <Navigate to='/login'/>
+        },
+        {
+          path: '/employer-jobs/:id',
+          element: authUser && employeeData ? <EmployerJobs /> : <Navigate to='/login'/>
         }
       ]
     }

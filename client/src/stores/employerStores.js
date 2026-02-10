@@ -4,6 +4,7 @@ import api from '../api/api';
 
 export const employeeStore = create((set) => ({
     employeeData: null,
+    employers: [],
     checkingEmployer: false,
     creatingEmployer: false,
     updatingEmployer: false,
@@ -45,6 +46,18 @@ export const employeeStore = create((set) => ({
             toast.error(message);
         } finally {
             set({ updatingEmployer: false });
+        }
+    },
+
+    getAllEmployers: async () => {
+        set({ checkingEmployer: true });
+        try {
+            const response = await api.get('/api/employer/all');
+            set({ employers: response.data.employers || [] }); 
+        } catch (err) {
+            toast.error('Failed to load companies');
+        } finally {
+            set({ checkingEmployer: false });
         }
     }
 }));

@@ -17,10 +17,12 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { applicationStore } from '@/stores/applicationStores'
 
 const Job = () => {
   const { id } = useParams()
   const { currentJob, singleJob, loadingSingleJob } = jobStore()
+  const { applyJob, applyingJob } = applicationStore() 
 
   useEffect(() => {
     if (id) singleJob(id)
@@ -139,8 +141,22 @@ const Job = () => {
                   </div>
                 </div>
 
-                <Button className="w-full h-12 text-lg font-bold gap-2 group shadow-lg">
-                  Apply Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <Button
+                  className="w-full h-12 text-lg font-bold gap-2 group shadow-lg"
+                  onClick={() => applyJob(currentJob._id)}
+                  disabled={applyingJob}
+                >
+                  {applyingJob ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Applying...
+                    </>
+                  ) : (
+                    <>
+                      Apply Now
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">
