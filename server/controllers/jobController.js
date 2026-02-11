@@ -118,8 +118,14 @@ const fetchJobById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const job = await Job.findById(id).populate('employer', 'companyName');
-
+    const job = await Job.findById(id)
+      .populate({
+        path: "applications",
+        populate: {
+          path: "applicant",
+          select: "_id name email"
+        }
+      })
     if (!job) {
       return res.status(404).json({
         success: false,

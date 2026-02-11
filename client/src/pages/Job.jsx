@@ -2,31 +2,39 @@ import React, { useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { jobStore } from '@/stores/jobStores'
 import { 
-  MapPin, 
-  Briefcase, 
-  DollarSign, 
-  Calendar, 
-  ChevronLeft, 
-  Building2, 
-  Share2, 
-  CheckCircle2,
-  Loader2,
-  ArrowRight
+  MapPin, Briefcase, DollarSign, Calendar, ChevronLeft, 
+  Building2, Share2, CheckCircle2, Loader2, ArrowRight, AlertCircle, Lock
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { applicationStore } from '@/stores/applicationStores'
+import { userAuth } from '@/stores/userStores'
 
 const Job = () => {
   const { id } = useParams()
+  
+  const { authUser } = userAuth() 
+  
   const { currentJob, singleJob, loadingSingleJob } = jobStore()
   const { applyJob, applyingJob } = applicationStore() 
 
   useEffect(() => {
     if (id) singleJob(id)
   }, [id, singleJob])
+  const isAuthenticated = !!authUser;
+  
+  const isOwnListing = authUser?.role === 'employer' && authUser?._id === currentJob?.employer?._id;
+  
+  const hasAlreadyApplied = currentJob?.applications?.some(appId => {
+    const idToCompare = appId?._id || appId;  
+    return authUser?.appliedJobs?.some(userAppId => {
+      const userAppStr = userAppId?._id || userAppId;
+      return userAppStr?.toString() === idToCompare?.toString();
+    });
+  });
+  const isEmployer = authUser?.role === 'employer';
 
   if (loadingSingleJob) {
     return (
@@ -75,10 +83,6 @@ const Job = () => {
                       <MapPin className="w-4 h-4" />
                       {currentJob.location}
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4" />
-                      Posted on {new Date(currentJob.createdAt).toLocaleDateString()}
-                    </div>
                   </div>
                 </div>
 
@@ -90,18 +94,6 @@ const Job = () => {
                     {currentJob.description}
                   </p>
                 </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold">Requirements</h3>
-                  <div className="grid gap-3">
-                    {currentJob.requirements?.map((req, index) => (
-                      <div key={index} className="flex items-start gap-3 text-muted-foreground">
-                        <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                        <span>{req}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>
@@ -110,12 +102,6 @@ const Job = () => {
             <Card className="border-none shadow-lg sticky top-24">
               <CardContent className="p-6 space-y-6">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Salary Range</span>
-                    <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
-                      Open
-                    </Badge>
-                  </div>
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-bold tracking-tight">
                       ${currentJob.salary?.min.toLocaleString()}
@@ -125,51 +111,71 @@ const Job = () => {
                       ${currentJob.salary?.max.toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground italic">Estimates based on market data</p>
                 </div>
 
                 <Separator />
 
+                {/* --- APPLICATION ACTION SECTION --- */}
                 <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2"><Briefcase className="w-4 h-4" /> Job Type</span>
-                    <span className="font-bold capitalize">{currentJob.jobType}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2"><MapPin className="w-4 h-4" /> Work Location</span>
-                    <span className="font-bold">{currentJob.location}</span>
-                  </div>
+                  {!isAuthenticated ? (
+                    <Button asChild className="w-full h-12 font-bold gap-2">
+                      <Link to="/login">
+                        <Lock className="w-4 h-4" /> Login to Apply
+                      </Link>
+                    </Button>
+                  ) : isOwnListing ? (
+                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col items-center text-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-amber-600" />
+                      <p className="text-sm font-bold text-amber-900">Your Listing</p>
+                      <p className="text-xs text-amber-700">You cannot apply to your own job post.</p>
+                      <Button asChild variant="link" className="text-xs text-amber-900 h-auto p-0 underline">
+                        <Link to="/employer-dashboard">Go to Dashboard</Link>
+                      </Button>
+                    </div>
+                  ) : hasAlreadyApplied ? (
+                    <Button 
+                      disabled 
+                      className="w-full h-12 bg-emerald-100 text-emerald-700 border border-emerald-200 disabled:opacity-100 disabled:cursor-not-allowed font-bold gap-2"
+                    >
+                      <CheckCircle2 className="w-5 h-5" />
+                      Already Applied
+                    </Button>
+                  ) : isEmployer ? (
+                    <div className="bg-slate-100 p-4 rounded-xl text-center">
+                      <p className="text-xs font-medium text-slate-500">Employer accounts cannot apply for jobs.</p>
+                    </div>
+                  ) : (
+                    <Button
+                      className="w-full h-12 text-lg font-bold gap-2 group shadow-lg"
+                      onClick={() => applyJob(currentJob._id)}
+                      disabled={applyingJob}
+                    >
+                      {applyingJob ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Applying...
+                        </>
+                      ) : (
+                        <>
+                          Apply Now
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
 
-                <Button
-                  className="w-full h-12 text-lg font-bold gap-2 group shadow-lg"
-                  onClick={() => applyJob(currentJob._id)}
-                  disabled={applyingJob}
-                >
-                  {applyingJob ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Applying...
-                    </>
-                  ) : (
-                    <>
-                      Apply Now
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </Button>
-
                 <p className="text-center text-xs text-muted-foreground">
-                  By clicking apply, you agree to our Terms of Service.
+                  Job posted on {new Date(currentJob.createdAt).toLocaleDateString()}
                 </p>
               </CardContent>
             </Card>
 
             <Card className="border-none shadow-sm bg-primary/5 border-primary/10">
               <CardContent className="p-6 space-y-3">
-                <h4 className="font-bold text-sm uppercase tracking-widest text-primary">About the Employer</h4>
+                <h4 className="font-bold text-sm uppercase tracking-widest text-primary">Employer Details</h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Join our mission to innovate. This company is a verified employer on JobFu.
+                  This role is managed by {currentJob.employer?.companyName || "a verified employer"}.
                 </p>
                 <Button variant="link" className="p-0 h-auto text-primary font-bold">
                   View Company Profile

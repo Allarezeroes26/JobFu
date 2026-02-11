@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 import { 
   MapPin, Briefcase, Pencil, ExternalLink, Loader2, 
   Plus, Trash, FolderGit2, Mail, GraduationCap, Globe, AlertTriangle, Building2 
@@ -47,14 +46,11 @@ const Profile = () => {
     reader.readAsDataURL(file)
   }
 
-  // Experience Handlers
   const addExperience = () => setExperience([...experience, { company: '', role: '', duration: '', desc: '' }])
   const removeExp = (index) => setExperience(experience.filter((_, i) => i !== index))
   const updateExp = (index, field, value) => {
     const updated = [...experience]; updated[index][field] = value; setExperience(updated)
   }
-
-  // Project Handlers
   const addProject = () => setProjects([...projects, { name: '', link: '', desc: '' }])
   const removeProject = (index) => setProjects(projects.filter((_, i) => i !== index))
   const updateProject = (index, field, value) => {
@@ -95,7 +91,6 @@ const Profile = () => {
     <div className="container mx-auto py-10 px-4 max-w-6xl">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* LEFT COLUMN: User Info & Actions */}
         <div className="lg:col-span-4 space-y-6">
           <Card className="text-center overflow-hidden border-none shadow-xl rounded-[2rem]">
             <div className="h-28 bg-gradient-to-r from-primary/20 to-primary/5 w-full" />
@@ -117,7 +112,6 @@ const Profile = () => {
               </div>
 
               <div className="mt-8 space-y-3">
-                {/* EDIT PROFILE DIALOG */}
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="w-full rounded-xl py-6 border-slate-200 gap-2 font-bold">
@@ -144,7 +138,6 @@ const Profile = () => {
                           </div>
                         </div>
 
-                        {/* Experience in Edit Dialog */}
                         <div className="space-y-4 border-t pt-6">
                           <div className="flex justify-between items-center">
                             <h3 className="font-bold flex items-center gap-2"><Briefcase className="h-4 w-4"/> Experience</h3>
@@ -160,7 +153,6 @@ const Profile = () => {
                             </div>
                           ))}
                         </div>
-                        {/* File Uploads */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-6">
                            <div className="space-y-2"><Label>Profile Picture</Label><Input type="file" ref={fileInputRef} onChange={handleProfilePicChange} accept="image/*" /></div>
                            <div className="space-y-2"><Label>Resume (PDF)</Label><Input type="file" ref={resumeInputRef} accept=".pdf" /></div>
@@ -174,7 +166,6 @@ const Profile = () => {
                   </DialogContent>
                 </Dialog>
 
-                {/* EMPLOYER SPECIAL ACTION */}
                 {authUser.role === 'employer' && !employeeData && (
                   <Dialog>
                     <DialogTrigger asChild>
@@ -202,7 +193,6 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          {/* SKILLS CARD */}
           <Card className="border-none shadow-md rounded-[2rem] p-2">
             <CardHeader><CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">Skills</CardTitle></CardHeader>
             <CardContent className="flex flex-wrap gap-2">
@@ -212,7 +202,6 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          {/* DANGER ZONE */}
           <Card className="border border-red-100 bg-red-50/30 rounded-[2rem] overflow-hidden">
             <CardHeader className="pb-3"><CardTitle className="text-sm font-bold text-red-600 flex items-center gap-2">Danger Zone</CardTitle></CardHeader>
             <CardContent>
@@ -237,7 +226,6 @@ const Profile = () => {
           </Card>
         </div>
 
-        {/* RIGHT COLUMN: Professional Content */}
         <div className="lg:col-span-8 space-y-6">
           <Card className="border-none shadow-sm rounded-3xl">
             <CardHeader><CardTitle className="text-xl font-bold">Experience</CardTitle></CardHeader>
@@ -317,7 +305,6 @@ const Profile = () => {
               </div>
             </Button>
             
-            {/* Optional sub-text */}
             <p className="mt-4 text-center text-xs font-bold uppercase tracking-widest text-slate-400">
               Exclusive features for recruiters and company owners
             </p>

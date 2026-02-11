@@ -16,6 +16,7 @@ import Job from './pages/Job'
 import Companies from './pages/Companies'
 import Company from './pages/Company'
 import EmployerJobs from './pages/EmployerJobs'
+import Activity from './pages/Activity'
 
 function App() {
 
@@ -87,7 +88,12 @@ function App() {
         {
           path: '/employer-jobs/:id',
           element: authUser && employeeData ? <EmployerJobs /> : <Navigate to='/login'/>
-        }
+        },
+        {
+          path: '/activity',
+          element: authUser ? <Activity /> : <Navigate to='/login'/>
+        },
+        
       ]
     }
   ])
