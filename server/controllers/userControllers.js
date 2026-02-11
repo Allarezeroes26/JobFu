@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 const genToken = require('../utils/generateToken');
 const cloudinary = require('../utils/cloudinary')
 const streamifier = require('streamifier')
+const Job = require("../models/jobModel");
+const Application = require("../models/applicationModel");
+const Employer = require("../models/employerModel")
 
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
@@ -13,10 +16,6 @@ const loginUser = async (req, res) => {
 
         if (!user) {
             return res.status(400).json({ success: false, message: 'Email not found' })
-        }
-
-        if (password.length < 8) {
-            return res.status(400).json({ success: false, message: 'Password should be 8 characters or more' })
         }
 
         const matchPassword = await bcrypt.compare(password, user.password)
@@ -193,20 +192,53 @@ const checkUser = async (req, res) => {
         res.status(500).json({ success: false, message: 'Checking failed!' })
     }
 }
+
+
 const deleteUser = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const user = await User.findByIdAndDelete(id)
+  try {
+    const userId = req.user._id;
 
-        if (!user) {
-            return res.status(400).json({ success: false, message: 'User did not exists or unauthorized' })
-        }
-
-        res.status(200).json({ success: true, message: "User deleted!" })
-    } catch (err) {
-        console.log('Deleting Failed', err)
-        res.status(500).json({ success: false, message: 'Deleting failed' })
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
-}
+
+    console.log("Deleting user:", user._id, "Role:", user.role);
+
+    if (user.role === "employer") {
+      const employer = await Employer.findOne({ user: userId });
+      if (employer) {
+        const jobs = await Job.find({ employer: employer._id });
+        const jobIds = jobs.map(job => job._id);
+        const appDel = await Application.deleteMany({ job: { $in: jobIds } });
+        const jobDel = await Job.deleteMany({ _id: { $in: jobIds } });
+
+        await Employer.findByIdAndDelete(employer._id);
+      }
+    }
+
+    if (user.role === "seeker") {
+      const applications = await Application.find({ applicant: userId });
+      const appIds = applications.map(app => app._id);
+      const jobUpdate = await Job.updateMany(
+        { applications: { $in: appIds } },
+        { $pull: { applications: { $in: appIds } } }
+      );
+      const appDel = await Application.deleteMany({ applicant: userId });
+    }
+
+    await User.findByIdAndDelete(userId);
+    console.log("Deleted user account");
+
+    res.status(200).json({
+      success: true,
+      message: "User and all related data deleted successfully"
+    });
+
+  } catch (err) {
+    console.error("Deleting Failed", err);
+    res.status(500).json({ success: false, message: "Deleting failed" });
+  }
+};
 
 module.exports = { loginUser, registerUser, logoutUser, updateUser, checkUser, deleteUser }

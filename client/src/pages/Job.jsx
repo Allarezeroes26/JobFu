@@ -115,7 +115,6 @@ const Job = () => {
 
                 <Separator />
 
-                {/* --- APPLICATION ACTION SECTION --- */}
                 <div className="space-y-3">
                   {!isAuthenticated ? (
                     <Button asChild className="w-full h-12 font-bold gap-2">

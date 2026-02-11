@@ -14,6 +14,6 @@ router.put('/update', authUpdate,
   ]), updateUser
 );
 router.get('/check', authUpdate, checkUser)
-router.delete('/delete/:id', authUpdate, deleteUser)
+router.delete('/delete', authUpdate, deleteUser)
 
 module.exports = router

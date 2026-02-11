@@ -11,12 +11,11 @@ export const userAuth = create((set) => ({
     isDeleting: false,
 
     checkUser: async () => {
-
         set({ isChecking: true })
-
         try {
             const response = await api.get('/api/auth/check')
-            set({ authUser: response.data })
+            // FIX: Ensure you are grabbing .user if your backend wraps it
+            set({ authUser: response.data.user || response.data }) 
         } catch (err) {
             set({ authUser: null })
         } finally {
@@ -26,7 +25,6 @@ export const userAuth = create((set) => ({
 
     login: async ({ email, password }) => {
         set({ isLogging: true });
-
         try {
             const response = await api.post('/api/auth/login', { email, password })
             set({ authUser: response.data.user })
@@ -38,12 +36,14 @@ export const userAuth = create((set) => ({
             set({ isLogging: false })
         }
     },
+
     register: async ({ firstName, lastName, email, password }) => {
         set({ isRegistering: true })
-        
         try {
             const response = await api.post('/api/auth/register', { firstName, lastName, email, password })
-            set({ authUser: response.data })
+            // FIX: Consistency with login logic
+            set({ authUser: response.data.user || response.data }) 
+            toast.success('Registration Successful')
         } catch (err) {
             const message = err.response?.data?.message || err.message || 'Something went wrong'
             toast.error(message)
@@ -67,9 +67,8 @@ export const userAuth = create((set) => ({
         set({ isUpdating: true })
         try {
             const res = await api.put('/api/auth/update', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        })
-
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
             set({ authUser: res.data.user })
             toast.success('Account successfully updated!')
         } catch (err) {
@@ -80,11 +79,10 @@ export const userAuth = create((set) => ({
         }
     },
 
-    deleteAccount: async (id) => {
+    deleteAccount: async () => {
         set({ isDeleting: true })
-
         try {
-            await api.delete(`/api/auth/delete/${id}`)
+            await api.delete(`/api/auth/delete`)
             set({ authUser: null })
             toast.success('Account deleted successfully')
         } catch (err) {

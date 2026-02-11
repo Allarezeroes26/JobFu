@@ -24,14 +24,21 @@ function App() {
   const { checkEmployer, employeeData } = employeeStore() 
 
   useEffect(() => {
-    checkUser()
-    checkEmployer()
-  }, [])
+    const initApp = async () => {
+      const user = await checkUser(); 
+      
+      if (user?.role === 'employer' || authUser?.role === 'employer') {
+        checkEmployer();
+      }
+    };
+
+    initApp();
+  }, []);
 
   if (isChecking) {
     return (
-      <div className="flex items-center justify-center">
-        <Loader className='animate-spin'/>
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="animate-spin w-10 h-10"/>
       </div>
     )
   }

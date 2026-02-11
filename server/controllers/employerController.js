@@ -192,9 +192,26 @@ const allEmployer = async (req, res) => {
   }
 }
 
+const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    await Job.deleteMany({ employer: userId });
+
+    await Application.deleteMany({ employer: userId }); 
+
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "Account and all associated jobs deleted." });
+  } catch (err) {
+    res.status(500).json({ message: "Server error during deletion." });
+  }
+};
+
 module.exports = {
   createEmployer,
   getMyEmployer,
   employerUpdate,
-  allEmployer
+  allEmployer,
+  deleteAccount
 }

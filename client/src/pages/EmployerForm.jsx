@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom' // Added for redirect
 import EmployeeBG from '../assets/employeeFormBG.jpg'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,9 +8,12 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Building2, Globe, MapPin, Briefcase, Camera } from "lucide-react"
 import { employeeStore } from '@/stores/employerStores'
+import { userAuth } from '@/stores/userStores' // Import your user store
 
 const EmployerForm = () => {
   const { createEmployer, creatingEmployer } = employeeStore()
+  const { checkUser } = userAuth() // Pull checkUser to sync auth state
+  const navigate = useNavigate()
 
   const fileInputRef = useRef()
   const [previewPic, setPreviewPic] = useState(null)
@@ -40,12 +44,19 @@ const EmployerForm = () => {
       formData.append("profilePic", profilePicFile)
     }
 
-    await createEmployer(formData)
+    // Call create and wait for result
+    const result = await createEmployer(formData)
+    
+    if (result?.success) {
+      // 1. Sync the user's role/auth status
+      await checkUser() 
+      // 2. Move to profile to see the new data
+      navigate('/profile') 
+    }
   }
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-      
       <div className="hidden lg:flex relative bg-primary items-center justify-center p-12 overflow-hidden">
         <img
           src={EmployeeBG}
@@ -85,14 +96,13 @@ const EmployerForm = () => {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-
               <div className="flex flex-col items-center gap-3">
                 <div
                   className="w-24 h-24 rounded-2xl bg-muted border-2 border-dashed flex items-center justify-center relative overflow-hidden cursor-pointer"
                   onClick={() => fileInputRef.current.click()}
                 >
                   {previewPic ? (
-                    <img src={previewPic} className="w-full h-full object-cover" />
+                    <img src={previewPic} className="w-full h-full object-cover" alt="Preview" />
                   ) : (
                     <Camera className="w-8 h-8 text-muted-foreground" />
                   )}
@@ -100,6 +110,7 @@ const EmployerForm = () => {
                 <input
                   ref={fileInputRef}
                   type="file"
+                  name="profilePic"
                   accept="image/*"
                   className="hidden"
                   onChange={handleProfilePicChange}
@@ -126,7 +137,7 @@ const EmployerForm = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="industry">Industry</Label>
-                  <Input id="industry" name="industry" placeholder="Technology" />
+                  <Input id="industry" name="industry" placeholder="Technology" required />
                 </div>
 
                 <div className="grid gap-2">
@@ -138,6 +149,7 @@ const EmployerForm = () => {
                       name="location"
                       placeholder="San Francisco"
                       className="pl-10"
+                      required
                     />
                   </div>
                 </div>
@@ -164,6 +176,7 @@ const EmployerForm = () => {
                   name="description"
                   placeholder="Describe your company culture and mission..."
                   className="min-h-[120px]"
+                  required
                 />
               </div>
 
@@ -174,7 +187,6 @@ const EmployerForm = () => {
               >
                 {creatingEmployer ? "Creating..." : "Complete Setup"}
               </Button>
-
             </form>
           </CardContent>
         </Card>
