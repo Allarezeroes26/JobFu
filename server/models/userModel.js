@@ -51,7 +51,6 @@ userSchema.pre("findOneAndDelete", async function () {
     const user = await User.findById(userId);
     if (!user) return;
 
-    // 🟢 Employer cleanup
     if (user.role === "employer") {
       const jobs = await Job.find({ employer: userId });
       const jobIds = jobs.map(job => job._id);
@@ -60,7 +59,6 @@ userSchema.pre("findOneAndDelete", async function () {
       await Job.deleteMany({ employer: userId });
     }
 
-    // 🔵 Seeker cleanup
     if (user.role === "seeker") {
       const applications = await Application.find({ applicant: userId });
       const applicationIds = applications.map(app => app._id);

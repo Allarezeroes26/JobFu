@@ -21,21 +21,22 @@ import Activity from './pages/Activity'
 function App() {
 
   const { checkUser, isChecking, authUser } = userAuth()
-  const { checkEmployer, employeeData } = employeeStore() 
+  const { checkEmployer, employeeData, checkingEmployer } = employeeStore() 
 
   useEffect(() => {
     const initApp = async () => {
       const user = await checkUser(); 
-      
-      if (user?.role === 'employer' || authUser?.role === 'employer') {
-        checkEmployer();
+      if (user?.role === 'employer') {
+        await checkEmployer();
       }
     };
 
     initApp();
   }, []);
 
-  if (isChecking) {
+  const isSyncing = isChecking || (authUser?.role === 'employer' && !employeeData && checkingEmployer);
+
+  if (isSyncing) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader className="animate-spin w-10 h-10"/>

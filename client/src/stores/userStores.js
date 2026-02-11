@@ -14,7 +14,6 @@ export const userAuth = create((set) => ({
         set({ isChecking: true })
         try {
             const response = await api.get('/api/auth/check')
-            // FIX: Ensure you are grabbing .user if your backend wraps it
             set({ authUser: response.data.user || response.data }) 
         } catch (err) {
             set({ authUser: null })
@@ -41,7 +40,6 @@ export const userAuth = create((set) => ({
         set({ isRegistering: true })
         try {
             const response = await api.post('/api/auth/register', { firstName, lastName, email, password })
-            // FIX: Consistency with login logic
             set({ authUser: response.data.user || response.data }) 
             toast.success('Registration Successful')
         } catch (err) {

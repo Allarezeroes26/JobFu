@@ -77,6 +77,36 @@ const fetchApplications = async (req, res) => {
   }
 };
 
+const updateStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+
+    if (!status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    const application = await Application.findById(id);
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    application.status = status.toLowerCase();
+    await application.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Status updated successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("Update status error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
-  applyForJob, fetchApplications
+  applyForJob, 
+  fetchApplications,
+  updateStatus
 };

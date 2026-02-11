@@ -5,6 +5,7 @@ import { jobStore } from "./jobStores";
 import { userAuth } from "./userStores";
 
 
+
 export const applicationStore = create((set, get) => ({
     userApplicationData: null,
     loadingApplications: false,
@@ -54,5 +55,35 @@ export const applicationStore = create((set, get) => ({
         } finally {
             set({ loadingApplications: false })
         }
-    }
+    },
+
+    updateApplicationStatus: async (applicationId, status) => {
+        try {
+            const res = await api.put(`/api/application/status/${applicationId}`, { status });
+            
+            const { userApplicationData } = get();
+            if (userApplicationData) {
+                set({
+                    userApplicationData: userApplicationData.map(app => 
+                        app._id === applicationId ? { ...app, status } : app
+                    )
+                });
+            }
+            const { employerJobs } = jobStore.getState();
+            if (employerJobs) {
+                const updatedEmployerJobs = employerJobs.map(job => ({
+                    ...job,
+                    applications: job.applications.map(app => 
+                        app._id === applicationId ? { ...app, status } : app
+                    )
+                }));
+                
+                jobStore.setState({ employerJobs: updatedEmployerJobs });
+            }
+
+            toast.success(`Application marked as ${status}`);
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to update status");
+        }
+    },
 }))
