@@ -280,30 +280,47 @@ const Profile = () => {
             </Card>
           )}
           {authUser.role === 'seeker' && (<div className="pt-6">
-            <Button 
-              onClick={() => navigate('/employer-form')}
-              className="group relative w-full overflow-hidden rounded-[2rem] py-10 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20"
-            >
-              <div className="absolute inset-0 bg-slate-900 transition-colors group-hover:bg-slate-800" />
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-              
-              <div className="relative z-10 flex w-full flex-col items-center justify-between gap-4 px-8 sm:flex-row">
-                <div className="flex items-center gap-5">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
-                    <Building2 className="h-7 w-7 text-white" />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  className="group relative w-full overflow-hidden rounded-[2rem] py-10 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20"
+                >
+                  <div className="absolute inset-0 bg-slate-900 transition-colors group-hover:bg-slate-800" />
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+                
+                  <div className="relative z-10 flex w-full flex-col items-center justify-between gap-4 px-8 sm:flex-row">
+                    <div className="flex items-center gap-5">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
+                        <Building2 className="h-7 w-7 text-white" />
+                      </div>
+                      <div className="text-left">
+                        <h3 className="text-xl font-black tracking-tight text-white">Hire Talent</h3>
+                        <p className="text-sm font-medium text-slate-400">Transform your account into an Employer profile</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-full bg-white px-6 py-2 font-bold text-slate-900 transition-all group-hover:bg-primary group-hover:text-white">
+                      Get Started
+                      <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
                   </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-black tracking-tight text-white">Hire Talent</h3>
-                    <p className="text-sm font-medium text-slate-400">Transform your account into an Employer profile</p>
-                  </div>
-                </div>
+                </Button>
+              </DialogTrigger>
 
-                <div className="flex items-center gap-2 rounded-full bg-white px-6 py-2 font-bold text-slate-900 transition-all group-hover:bg-primary group-hover:text-white">
-                  Get Started
-                  <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </div>
-              </div>
-            </Button>
+              <DialogContent className="sm:max-w-sm">
+                <DialogHeader>
+                  <DialogTitle>Employee Profile</DialogTitle>
+                  <DialogDescription>
+                    Are you sure? You won't be able to switch back to <span className='font-bold'>SEEKER</span> mode?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button onClick={() => navigate('/employer-form')} className='bg-amber-600 hover:bg-amber-700' variant='default'>Save changes</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             
             <p className="mt-4 text-center text-xs font-bold uppercase tracking-widest text-slate-400">
               Exclusive features for recruiters and company owners

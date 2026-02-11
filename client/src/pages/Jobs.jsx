@@ -16,7 +16,6 @@ import { Link } from 'react-router-dom'
 const Jobs = () => {
   const { jobs, getAllJobs, gettingAllJob } = jobStore()
   
-  // --- Filter States ---
   const [searchQuery, setSearchQuery] = useState("")
   const [locationQuery, setLocationQuery] = useState("")
   const [selectedTypes, setSelectedTypes] = useState([])
@@ -26,7 +25,6 @@ const Jobs = () => {
     getAllJobs()
   }, [])
 
-  // --- Filtering Logic ---
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
       const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -46,7 +44,6 @@ const Jobs = () => {
     })
   }, [jobs, searchQuery, locationQuery, selectedTypes, salaryRange]);
 
-  // --- Handlers ---
   const handleTypeChange = (type) => {
     const lowerType = type.toLowerCase();
     setSelectedTypes(prev => 
@@ -65,7 +62,6 @@ const Jobs = () => {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Search Hero Section */}
       <div className="bg-background border-b py-12 px-4">
         <div className="container mx-auto max-w-5xl text-center space-y-6">
           <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Find your dream job</h1>
@@ -99,7 +95,6 @@ const Jobs = () => {
       <div className="container mx-auto max-w-7xl py-10 px-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          {/* Filters Sidebar */}
           <aside className="hidden lg:block space-y-8">
             <div className="sticky top-24">
               <div className="flex items-center justify-between mb-4">
@@ -112,7 +107,6 @@ const Jobs = () => {
               </div>
 
               <div className="space-y-8 bg-card p-6 rounded-xl border shadow-sm">
-                {/* Job Type Filter */}
                 <div className="space-y-4">
                   <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Job Type</Label>
                   <div className="grid gap-3">
@@ -133,7 +127,6 @@ const Jobs = () => {
 
                 <Separator />
 
-                {/* Salary Range Filter */}
                 <div className="space-y-4">
                   <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Salary Range ($)</Label>
                   <div className="grid grid-cols-2 gap-3">
@@ -163,14 +156,12 @@ const Jobs = () => {
             </div>
           </aside>
 
-          {/* Jobs Feed */}
           <main className="lg:col-span-3 space-y-4">
             <div className="flex items-center justify-between mb-6 bg-card p-4 rounded-xl border shadow-sm">
               <p className="text-sm text-muted-foreground">
                 Showing <span className="font-bold text-foreground">{filteredJobs.length}</span> results
               </p>
               
-              {/* Active Filter Badges */}
               <div className="flex gap-2">
                 {selectedTypes.map(type => (
                   <Badge key={type} variant="secondary" className="capitalize flex items-center gap-1 py-1">
