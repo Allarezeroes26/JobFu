@@ -96,4 +96,16 @@ Open http://localhost:3000
 
  ---
 
- 
+# Usage
+
+### For Job Seekers:
+
+Sign up or log in <br/>
+Browse and apply to jobs <br/>
+Update profile and resume <br/>
+
+### For Employers:
+
+Sign up or log in <br/>
+Post and manage job listings <br/>
+Review applications and connect with candidates <br/>
