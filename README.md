@@ -96,7 +96,7 @@ Open http://localhost:3000
 
  ---
 
-# Usage
+# 🛠️ Usage
 
 ### For Job Seekers:
 
@@ -109,3 +109,13 @@ Update profile and resume <br/>
 Sign up or log in <br/>
 Post and manage job listings <br/>
 Review applications and connect with candidates <br/>
+
+---
+
+# 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+Made by Erwin 😊
