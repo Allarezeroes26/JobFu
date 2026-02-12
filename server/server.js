@@ -17,7 +17,7 @@ const port = process.env.PORT || 8001;
 app.use(express.json({limit: '10mb'}))
 app.use(cookieparser())
 app.use(cors({
-    origin: process.env.FRONTEND,
+    origin: process.env.FRONTEND || process.env.PORT,
     credentials: true
 }))
 
