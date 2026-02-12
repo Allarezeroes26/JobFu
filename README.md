@@ -28,9 +28,9 @@ https://jobfufrontend.onrender.com
 
 # Features
 
-User Roles: Separate dashboards for Job Seekers and Employers.\n
-Job Listings: Employers can post, edit, and delete jobs.
-Job Applications: Job seekers can apply for jobs with a single click.
-Profile Management: Users can manage personal and professional details.
-Notifications: Real-time updates for applications and job postings.
-Search & Filters: Search jobs by keywords, location, or category.
+- User Roles: Separate dashboards for Job Seekers and Employers.
+- Job Listings: Employers can post, edit, and delete jobs.
+- Job Applications: Job seekers can apply for jobs with a single click.
+- Profile Management: Users can manage personal and professional details.
+- Notifications: Real-time updates for applications and job postings.
+- Search & Filters: Search jobs by keywords, location, or category.
