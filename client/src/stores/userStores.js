@@ -14,9 +14,12 @@ export const userAuth = create((set) => ({
         set({ isChecking: true })
         try {
             const response = await api.get('/api/auth/check')
-            set({ authUser: response.data.user || response.data }) 
+            const user = response.data.user || response.data;
+            set({ authUser: user }) 
+            return user;
         } catch (err) {
-            set({ authUser: null })
+            set({ authUser: null }) 
+            return null;
         } finally {
             set({ isChecking: false })
         }
@@ -26,7 +29,7 @@ export const userAuth = create((set) => ({
         set({ isLogging: true });
         try {
             const response = await api.post('/api/auth/login', { email, password })
-            set({ authUser: response.data.user })
+            set({ authUser: response.data.user || response.data })
             toast.success('Login Successful')
         } catch (err) {
             const message = err.response?.data?.message || err.message || 'Something went wrong'

@@ -1,6 +1,6 @@
-import { create } from "zustand"
-import api from "@/api/api"
-import {toast} from "react-hot-toast" 
+import { create } from "zustand";
+import api from "@/api/api";
+import { toast } from "react-hot-toast";
 
 export const jobStore = create((set) => ({
   jobs: [],
@@ -14,65 +14,78 @@ export const jobStore = create((set) => ({
   loadingEmployerJobs: false,
 
   jobPost: async (data) => {
-    set({ postingJob: true })
+    set({ postingJob: true });
+
     try {
-      const res = await api.post('/api/jobs/post-job', data)
-      toast.success('Job Posted')
+      const res = await api.post("/api/jobs/post-job", data);
+      const updatedJobs = await api.get("/api/jobs/my-jobs");
+
+      set({ employerJobs: updatedJobs.data.jobs || [] });
+
+      toast.success("Job Posted");
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Something went wrong')
+      toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
-      set({ postingJob: false })
+      set({ postingJob: false });
     }
   },
 
   deleteJob: async (id) => {
-    set({ deletingJob: true })
+    set({ deletingJob: true });
+
     try {
-      await api.delete(`/api/jobs/delete-job/${id}`)
+      await api.delete(`/api/jobs/delete-job/${id}`);
+
       set((state) => ({
-        employerJobs: state.employerJobs.filter(job => job._id !== id)
-      }))
-      toast.success('Delete Job Success!')
+        employerJobs: state.employerJobs.filter(
+          (job) => job._id !== id
+        ),
+      }));
+
+      toast.success("Delete Job Success!");
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Something went wrong')
+      toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
-      set({ deletingJob: false })
+      set({ deletingJob: false });
     }
   },
 
   getAllJobs: async () => {
-    set({ gettingAllJob: true })
+    set({ gettingAllJob: true });
+
     try {
-      const res = await api.get('/api/jobs/all-jobs')
-      set({ jobs: res.data.jobs })
+      const res = await api.get("/api/jobs/all-jobs");
+      set({ jobs: res.data.jobs || [] });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Something went wrong')
+      toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
-      set({ gettingAllJob: false })
+      set({ gettingAllJob: false });
     }
   },
 
   currentEmployerJobs: async () => {
-    set({ loadingEmployerJobs: true })
+    set({ loadingEmployerJobs: true });
+
     try {
-      const res = await api.get('/api/jobs/my-jobs')
-      set({ employerJobs: res.data.jobs })
+      const res = await api.get("/api/jobs/my-jobs");
+      set({ employerJobs: res.data.jobs || [] });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Something went wrong')
+      toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
-      set({ loadingEmployerJobs: false })
+      set({ loadingEmployerJobs: false });
     }
   },
 
   singleJob: async (id) => {
-    set({ loadingSingleJob: true })
+    set({ loadingSingleJob: true });
+
     try {
-      const res = await api.get(`/api/jobs/job/${id}`)
-      set({ currentJob: res.data.job })
+      const res = await api.get(`/api/jobs/job/${id}`);
+      set({ currentJob: res.data.job });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Something went wrong')
+      toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
-      set({ loadingSingleJob: false })
+      set({ loadingSingleJob: false });
     }
-  }
-}))
+  },
+}));

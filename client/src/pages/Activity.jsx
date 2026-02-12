@@ -6,26 +6,28 @@ import { Button } from "@/components/ui/button"
 import { 
   Loader2, Briefcase, MapPin, Calendar, 
   ArrowRight, CheckCircle2, Clock, Eye, 
-  XCircle, Search 
+  XCircle, Search, Lock
 } from 'lucide-react'
 import { applicationStore } from '@/stores/applicationStores'
+import { userAuth } from '@/stores/userStores'
 import { cn } from "@/lib/utils"
 
 const Activity = () => {
   const { userApplicationData, fetchApplication, loadingApplications } = applicationStore()
+  const { authUser } = userAuth()
 
   useEffect(() => {
-    if (fetchApplication) fetchApplication()
-  }, [])
+    if (fetchApplication && authUser?.role !== 'employer') {
+        fetchApplication()
+    }
+  }, [authUser])
 
   const steps = ["applied", "seen", "reviewed", "accepted"]
   
   const getStepStatus = (currentStatus, stepName) => {
     if (currentStatus === "rejected") return "rejected"
-    
     const statusIdx = steps.indexOf(currentStatus)
     const stepIdx = steps.indexOf(stepName)
-    
     if (statusIdx >= stepIdx) return "completed"
     return "pending"
   }
@@ -39,6 +41,30 @@ const Activity = () => {
       case "accepted": return "100%"
       default: return "0%"
     }
+  }
+
+  if (authUser?.role === 'employer') {
+    return (
+      <div className="container mx-auto max-w-4xl py-20 px-4">
+        <Card className="border-none shadow-2xl bg-slate-900 text-white overflow-hidden rounded-[2rem]">
+          <CardContent className="flex flex-col items-center justify-center text-center p-12 space-y-6">
+            <div className="bg-white/10 p-6 rounded-full ring-8 ring-white/5">
+              <Lock className="w-12 h-12 text-blue-400" />
+            </div>
+            <div className="space-y-3">
+              <h2 className="text-3xl font-black tracking-tight">Candidate Access Only</h2>
+              <p className="text-slate-400 max-w-sm mx-auto">
+                The Activity tracker is for job seekers to monitor their applications. 
+                As an employer, you can manage your listings and applicants in the dashboard.
+              </p>
+            </div>
+            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 rounded-full px-10">
+              <Link to="/employer-dashboard">Go to Employer Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (loadingApplications) {

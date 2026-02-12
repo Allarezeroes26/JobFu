@@ -1,38 +1,58 @@
 import { create } from "zustand";
-import { toast } from 'react-hot-toast';
-import api from '../api/api';
+import { toast } from "react-hot-toast";
+import api from "../api/api";
 
-export const employeeStore = create((set) => ({
-  employeeData: null,
+export const employeeStore = create((set, get) => ({
+  employerProfile: null,
   employers: [],
-  checkingEmployer: false,
+
+  checkingEmployerProfile: false, // ✅ NEW
+  checkingEmployersList: false,   // ✅ NEW
   creatingEmployer: false,
   updatingEmployer: false,
 
   checkEmployer: async () => {
-    set({ checkingEmployer: true });
+    set({ checkingEmployerProfile: true });
+    if (get().employerProfile) {
+      set({ checkingEmployerProfile: false });
+      return;
+    }
     try {
-      const response = await api.get('/api/employer/me');
-      set({ employeeData: response.data.employer });
-    } catch (err) {
-      set({ employeeData: null });
+      const res = await api.get("/api/employer/me");
+      set({ employerProfile: res.data.employer });
+    } catch {
+      set({ employerProfile: null });
     } finally {
-      set({ checkingEmployer: false });
+      set({ checkingEmployerProfile: false });
+    }
+  },
+
+  getAllEmployers: async () => {
+    set({ checkingEmployersList: true });
+    try {
+      const res = await api.get("/api/employer/all");
+      set({ employers: res.data.employers || [] });
+    } catch {
+      toast.error("Failed to load companies");
+    } finally {
+      set({ checkingEmployersList: false });
     }
   },
 
   createEmployer: async (formData) => {
     set({ creatingEmployer: true });
+
     try {
       const res = await api.post("/api/employer/create", formData);
-      // Ensure we extract the employer object from the response
-      set({ employeeData: res.data.employer || res.data });
+
+      set({ employerProfile: res.data.employer });
       toast.success("Employer profile created!");
+
       return { success: true };
-    } catch (error) {
-      // Extract specific backend error message
-      const message = error.response?.data?.message || "Failed to create profile";
-      toast.error(message);
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Failed to create profile"
+      );
       return { success: false };
     } finally {
       set({ creatingEmployer: false });
@@ -41,27 +61,18 @@ export const employeeStore = create((set) => ({
 
   updateEmployer: async (data) => {
     set({ updatingEmployer: true });
+
     try {
-      const response = await api.put('/api/employer/update', data);
-      set({ employeeData: response.data.employer });
-      toast.success('Employer profile updated!');
+      const res = await api.put("/api/employer/update", data);
+      set({ employerProfile: res.data.employer });
+      toast.success("Employer profile updated!");
     } catch (err) {
-      const message = err.response?.data?.message || err.message || 'Something went wrong';
-      toast.error(message);
+      toast.error(
+        err.response?.data?.message || "Something went wrong"
+      );
     } finally {
       set({ updatingEmployer: false });
     }
   },
 
-  getAllEmployers: async () => {
-    set({ checkingEmployer: true });
-    try {
-      const response = await api.get('/api/employer/all');
-      set({ employers: response.data.employers || [] });
-    } catch (err) {
-      toast.error('Failed to load companies');
-    } finally {
-      set({ checkingEmployer: false });
-    }
-  }
 }));

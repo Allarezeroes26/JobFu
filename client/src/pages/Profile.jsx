@@ -16,8 +16,8 @@ import {
 } from 'lucide-react'
 
 const Profile = () => {
-  const { authUser, isChecking, update, deleteAccount, isDeleting, checkUser } = userAuth() // Added checkUser
-  const { employeeData, createEmployer, creatingEmployer, checkEmployer } = employeeStore()
+  const { authUser, isChecking, update, deleteAccount, isDeleting, checkUser } = userAuth()
+  const { employerProfile, createEmployer, checkEmployer, creatingEmployer } = employeeStore()
   const navigate = useNavigate()
   
   const fileInputRef = useRef()
@@ -34,10 +34,11 @@ const Profile = () => {
       setExperience(authUser.experience || [])
       setProjects(authUser.projects || [])
       setSkillsString(authUser.skills?.join(", ") || "")
-      if(authUser.role === 'employer') checkEmployer()
+      if (authUser.role === 'employer' && !employerProfile && !employeeStore.getState().checkingEmployer) {
+        checkEmployer()
+      }
     }
-  }, [authUser]) // Removed checkEmployer from deps to prevent unnecessary cycles
-
+  }, [authUser, employerProfile, checkEmployer])
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -79,10 +80,9 @@ const Profile = () => {
   const handleCreateEmployer = async (e) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-    // Removed Object.fromEntries to support multipart/form-data
     const result = await createEmployer(formData)
     if (result?.success) {
-      await checkUser() // Sync the user role immediately
+      await checkUser()
     }
   }
 
@@ -169,7 +169,7 @@ const Profile = () => {
                   </DialogContent>
                 </Dialog>
 
-                {authUser.role === 'employer' && !employeeData && (
+                {authUser.role === 'employer' && !employerProfile && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button className="w-full rounded-xl py-6 gap-2 font-bold shadow-lg shadow-primary/20">
@@ -265,6 +265,21 @@ const Profile = () => {
                   <p className="text-sm text-slate-500 mt-2 line-clamp-3">{proj.desc}</p>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm rounded-3xl">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold">About {authUser?.firstName}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 italic text-slate-700 leading-relaxed">
+                {authUser.description ? (
+                  <p className="whitespace-pre-line">{authUser.description}</p>
+                ) : (
+                  <p className="text-muted-foreground">No bio provided.</p>
+                )}
+              </div>
             </CardContent>
           </Card>
 

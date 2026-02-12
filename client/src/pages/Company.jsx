@@ -14,24 +14,26 @@ import { employeeStore } from '../stores/employerStores'
 
 const Company = () => {
   const { id } = useParams()
-  const { jobs, getAllJobs } = jobStore()
-  const { employers, getAllEmployers } = employeeStore()
+  const { jobs, getAllJobs, gettingAllJob } = jobStore()
+  const { employers, getAllEmployers, checkingEmployers } = employeeStore()
 
   useEffect(() => {
     getAllJobs()
     getAllEmployers()
   }, [])
 
+  const isLoading = gettingAllJob || checkingEmployers || !jobs.length || !employers.length
   const company = employers.find(emp => emp._id === id)
-  
   const companyJobs = jobs.filter(job => job.employer?._id === id || job.employer === id)
 
-  if (!company) {
+  if (isLoading || !company) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <Building2 className="w-12 h-12 mx-auto text-muted-foreground animate-pulse" />
-          <p className="mt-4 text-lg font-medium">Loading company profile...</p>
+          <p className="mt-4 text-lg font-medium">
+            {isLoading ? "Loading company profile..." : "Company not found"}
+          </p>
         </div>
       </div>
     )

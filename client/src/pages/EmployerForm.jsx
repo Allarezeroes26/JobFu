@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom' // Added for redirect
+import { useNavigate } from 'react-router-dom'
 import EmployeeBG from '../assets/employeeFormBG.jpg'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,11 +8,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Building2, Globe, MapPin, Briefcase, Camera } from "lucide-react"
 import { employeeStore } from '@/stores/employerStores'
-import { userAuth } from '@/stores/userStores' // Import your user store
+import { userAuth } from '@/stores/userStores'
 
 const EmployerForm = () => {
   const { createEmployer, creatingEmployer } = employeeStore()
-  const { checkUser } = userAuth() // Pull checkUser to sync auth state
+  const { checkUser } = userAuth()
   const navigate = useNavigate()
 
   const fileInputRef = useRef()
@@ -44,13 +44,10 @@ const EmployerForm = () => {
       formData.append("profilePic", profilePicFile)
     }
 
-    // Call create and wait for result
     const result = await createEmployer(formData)
     
     if (result?.success) {
-      // 1. Sync the user's role/auth status
       await checkUser() 
-      // 2. Move to profile to see the new data
       navigate('/profile') 
     }
   }
