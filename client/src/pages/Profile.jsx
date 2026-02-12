@@ -63,7 +63,7 @@ const Profile = () => {
     setIsUpdating(true)
     const formData = new FormData(e.currentTarget)
     formData.append("skills", skillsString)
-    formData.append("experience", JSON.stringify(experience))    
+    formData.append("experience", JSON.stringify(experience))
     formData.append("projects", JSON.stringify(projects))
     
     if (fileInputRef.current?.files[0]) formData.append("profilePic", fileInputRef.current.files[0])
@@ -155,6 +155,46 @@ const Profile = () => {
                               <Textarea placeholder="Desc..." className="col-span-2" value={exp.desc} onChange={e => updateExp(i, 'desc', e.target.value)} />
                             </div>
                           ))}
+
+                          <div className="space-y-4 border-t pt-6">
+                            <div className="flex justify-between items-center">
+                              <h3 className="font-bold flex items-center gap-2"><FolderGit2 className="h-4 w-4"/> Projects</h3>
+                              <Button type="button" variant="outline" size="sm" onClick={addProject}>
+                                <Plus className="h-4 w-4"/>
+                              </Button>
+                            </div>
+
+                            {projects.map((proj, i) => (
+                              <div key={i} className="p-4 bg-slate-50 rounded-lg border relative grid grid-cols-2 gap-3">
+                                <Button 
+                                  type="button" 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="absolute -top-2 -right-2 bg-white shadow-sm text-red-500 rounded-full h-8 w-8" 
+                                  onClick={() => removeProject(i)}
+                                >
+                                  <Trash className="h-4 w-4"/>
+                                </Button>
+
+                                <Input 
+                                  placeholder="Project Name" 
+                                  value={proj.name} 
+                                  onChange={e => updateProject(i, 'name', e.target.value)} 
+                                />
+                                <Input 
+                                  placeholder="Project Link" 
+                                  value={proj.link} 
+                                  onChange={e => updateProject(i, 'link', e.target.value)} 
+                                />
+                                <Textarea 
+                                  placeholder="Project Description" 
+                                  className="col-span-2" 
+                                  value={proj.desc} 
+                                  onChange={e => updateProject(i, 'desc', e.target.value)} 
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-6">
                            <div className="space-y-2"><Label>Profile Picture</Label><Input type="file" ref={fileInputRef} onChange={handleProfilePicChange} accept="image/*" /></div>

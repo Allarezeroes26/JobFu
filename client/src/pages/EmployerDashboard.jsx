@@ -48,8 +48,6 @@ const EmployerDashboard = () => {
   const stats = [
     { title: "Active Listings", value: activeJobs, icon: Briefcase, color: "text-blue-600", bg: "bg-blue-100" },
     { title: "Total Applicants", value: totalApplicants, icon: Users, color: "text-purple-600", bg: "bg-purple-100" },
-    { title: "Engagement", value: "+24%", icon: TrendingUp, color: "text-green-600", bg: "bg-green-100" },
-    { title: "Company Views", value: "1.2k", icon: CheckCircle2, color: "text-orange-600", bg: "bg-orange-100" },
   ]
 
   const confirmDelete = async () => {
@@ -138,7 +136,6 @@ const EmployerDashboard = () => {
                         key={job._id} 
                         className="p-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors"
                       >
-                        {/* Left: clickable area to navigate */}
                         <div
                           className="space-y-1 cursor-pointer flex-1"
                           onClick={() => navigate(`/employer-jobs/${job._id}`)}
