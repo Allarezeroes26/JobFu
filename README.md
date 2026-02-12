@@ -8,6 +8,8 @@ JobFu is a modern job portal web application designed to connect job seekers wit
 
 https://jobfufrontend.onrender.com
 
+---
+
 ### Test Accounts:
 
   ### Employer Account:
