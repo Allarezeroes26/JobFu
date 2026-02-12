@@ -13,10 +13,16 @@ https://jobfufrontend.onrender.com
 ### Test Accounts:
 
   ### Employer Account:
+  ```
   Email: alice@techcorp.com
   Password: alice 1234567890
+  ```
 
   ### Seeker Account:
+  ```
   Email: johndoe@gmail.com
   Password: john 1234567890
+  ```
+
+---
 
