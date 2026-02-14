@@ -1,6 +1,6 @@
 # 🏢 JobFu (Job Portal Web App)
 
-JobFu is a job portal web application designed to connect job seekers with employers efficiently. It provides features for job listings, applications, user profiles, and real-time interaction between employers and job seekers.
+JobFu is a job portal web application designed to connect job seekers with employers. It provides features for job listings, applications, user profiles, and real-time interaction between employers and job seekers.
 
 ---
 
